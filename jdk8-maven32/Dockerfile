@@ -61,6 +61,17 @@ ENV JSON_VERSION 9.0.3
 # Install json tools
 RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
 
+# Specific for GateIn, install Tomcat and Jboss dependencies
+RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache-tomcat-7.0.16.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-tomcat-7.0.16 /apache-tomcat-7.0.16 \
+  && curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.37/bin/apache-tomcat-7.0.37.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-tomcat-7.0.37 /apache-tomcat-7.0.37 \
+  && curl -fsSL http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/jboss-as-7.1.1.Final /jboss-as-7.1.1.Final \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /jboss-as-7.1.1.Final \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /apache-tomcat-7.0.37 \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /apache-tomcat-7.0.16
+
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
