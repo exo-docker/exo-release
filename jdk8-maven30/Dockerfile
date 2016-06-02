@@ -1,5 +1,5 @@
 FROM       exoplatform/ci:jdk8-maven30
-MAINTAINER GREAU Maxime <mgreau+docker@exoplatform.com>
+MAINTAINER eXo Platform <docker@exoplatform.com>
 
 ###
 # Environment variables needed for eXoR
@@ -59,10 +59,24 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
 ## TODO Replace by jq
 ENV JSON_VERSION 9.0.3
 # Install json tools
-RUN apt-get update && apt-get install -y sudo nodejs-legacy && apt-get clean
+RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
 RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib/json.js -o ${TOOLS_DIR}/json \
    && chmod 755 ${TOOLS_DIR}/json
+
+# Install eXo Release Manager
+ENV EXOR_VERSION 1.1.0
+RUN curl -fsSL http://storage.exoplatform.org/downloads/tmp/swf-release-manager-${EXOR_VERSION}.tar.gz \
+        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
+        && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
+        && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
+        && cp -R ${EXO_CI_TMP_DIR}/app/datas/* ${DATAS_DIR} \
+        && rm -rf ${EXO_CI_TMP_DIR}/app \
+        && chmod u+x ${SCRIPTS_DIR}/*.sh \
+        && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
+
+ENTRYPOINT ["/opt/exo-release/scripts/setup-env.sh"]
+CMD ["help"]
