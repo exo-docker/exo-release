@@ -59,7 +59,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
 ## TODO Replace by jq
 ENV JSON_VERSION 9.0.3
 # Install json tools
-RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
+RUN apt-get update && apt-get install -y sudo nodejs-legacy && apt-get clean
 
 # Specific for GateIn, install Tomcat and Jboss dependencies
 RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache-tomcat-7.0.16.tar.gz | tar xzf - -C /usr/share \

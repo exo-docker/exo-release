@@ -59,7 +59,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
 ## TODO Replace by jq
 ENV JSON_VERSION 9.0.3
 # Install json tools
-RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
+RUN apt-get update && apt-get install -y sudo nodejs-legacy && apt-get clean
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
