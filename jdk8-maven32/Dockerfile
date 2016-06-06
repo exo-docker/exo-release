@@ -68,8 +68,8 @@ RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib
    && chmod 755 ${TOOLS_DIR}/json
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.1.0
-RUN curl -fsSL http://storage.exoplatform.org/downloads/tmp/swf-release-manager-${EXOR_VERSION}.tar.gz \
+ENV EXOR_VERSION 1.0.0
+RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
         && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
