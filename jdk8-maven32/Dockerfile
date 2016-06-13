@@ -29,7 +29,7 @@ ENV PRJ_DIR ${WORKSPACE_DIR}/projects
 ENV SCRIPTS_DIR ${EXOR_HOME}/scripts
 # Config for Maven, SSH, GIT
 ENV CONFIG_DIR ${EXOR_HOME}/config
-ENV CREDENTIALS_FILE ${HOME}/.swf_cred
+ENV CREDENTIALS_FILE ${HOME}/.exo_cred
 # Tools required (Maven, Git...)
 ENV TOOLS_DIR ${EXOR_HOME}/tools
 # Dependencies (Tomcat, JBoss) needed for some projects
@@ -59,7 +59,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
 ## TODO Replace by jq
 ENV JSON_VERSION 9.0.3
 # Install json tools
-RUN apt-get update && apt-get install -y sudo nodejs-legacy && apt-get clean
+RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
@@ -68,7 +68,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib
    && chmod 755 ${TOOLS_DIR}/json
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.0.0
+ENV EXOR_VERSION 1.1.0
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
@@ -77,6 +77,18 @@ RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR
         && rm -rf ${EXO_CI_TMP_DIR}/app \
         && chmod u+x ${SCRIPTS_DIR}/*.sh \
         && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
+
+# Secure credentials
+ARG ssh_passphrase=default
+ARG nexus_token=default
+ARG gpg_passphrase=default
+ARG jira_auth_header=default
+ARG jboss_password=default
+RUN echo "ssh_passphrase=`echo -n "$ssh_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+    && echo "nexus_token=`echo -n "$nexus_token" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+    && echo "gpg_passphrase=`echo -n "$gpg_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+    && echo "jira_auth_header=`echo -n "$jira_auth_header" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+    && echo "jboss_password=`echo -n "$jboss_password" | openssl enc -base64`" >> ${CREDENTIALS_FILE}
 
 ENTRYPOINT ["/opt/exo-release/scripts/setup-env.sh"]
 CMD ["help"]

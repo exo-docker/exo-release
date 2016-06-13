@@ -79,15 +79,27 @@ RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib
    && chmod 755 ${TOOLS_DIR}/json
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.0.0
+ENV EXOR_VERSION 1.1.0
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
-        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
-        && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
-        && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
-        && cp -R ${EXO_CI_TMP_DIR}/app/datas/* ${DATAS_DIR} \
-        && rm -rf ${EXO_CI_TMP_DIR}/app \
-        && chmod u+x ${SCRIPTS_DIR}/*.sh \
-        && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
+       | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
+       && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
+       && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
+       && cp -R ${EXO_CI_TMP_DIR}/app/datas/* ${DATAS_DIR} \
+       && rm -rf ${EXO_CI_TMP_DIR}/app \
+       && chmod u+x ${SCRIPTS_DIR}/*.sh \
+       && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
+
+# Secure credentials
+ARG ssh_passphrase=default
+ARG nexus_token=default
+ARG gpg_passphrase=default
+ARG jira_auth_header=default
+ARG jboss_password=default
+RUN echo "ssh_passphrase=`echo -n "$ssh_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "nexus_token=`echo -n "$nexus_token" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "gpg_passphrase=`echo -n "$gpg_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "jira_auth_header=`echo -n "$jira_auth_header" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "jboss_password=`echo -n "$jboss_password" | openssl enc -base64`" >> ${CREDENTIALS_FILE}
 
 ENTRYPOINT ["/opt/exo-release/scripts/setup-env.sh"]
 CMD ["help"]
