@@ -62,7 +62,7 @@ ENV JSON_VERSION 9.0.3
 RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
-RUN chown -R /
+RUN chown -R /*
 
 USER ${EXO_CI_USER}
 RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib/json.js -o ${TOOLS_DIR}/json \
