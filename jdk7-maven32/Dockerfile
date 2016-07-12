@@ -1,11 +1,6 @@
 FROM       exoplatform/ci:jdk7-maven32
 MAINTAINER eXo Platform <docker@exoplatform.com>
 
-RUN locale-gen en_GB.UTF-8
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:en
-ENV LC_ALL en_GB.UTF-8
-
 ###
 # Environment variables needed for eXoR
 ###
@@ -43,6 +38,12 @@ ENV LOCAL_DEPENDENCIES_DIR ${EXOR_HOME}/exo-dependencies
 ENV BACKUPS_DIR ${EXOR_HOME}/backup
 
 USER root
+
+RUN locale-gen en_GB.UTF-8
+ENV LANG en_GB.UTF-8
+ENV LANGUAGE en_GB:en
+ENV LC_ALL en_GB.UTF-8
+
 #
 # Server directories layout
 #
