@@ -62,9 +62,9 @@ ENV JSON_VERSION 9.0.3
 RUN apt-get update && apt-get install -y sudo nodejs-legacy expect && apt-get clean
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
+RUN chown -R /
 
 USER ${EXO_CI_USER}
-ENV MAVEN_OPTS=${MAVEN_OPTS}" -Dservers.dir=${LOCAL_DEPENDENCIES_DIR}"
 RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib/json.js -o ${TOOLS_DIR}/json \
    && chmod 755 ${TOOLS_DIR}/json
 
