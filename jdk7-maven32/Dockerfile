@@ -39,13 +39,6 @@ ENV BACKUPS_DIR ${EXOR_HOME}/backup
 
 USER root
 
-# Override locale to be align with CI server (no docker)
-# To fix when all CI jobs will be in docker
-RUN locale-gen en_GB.UTF-8
-ENV LANG en_GB.UTF-8
-ENV LANGUAGE en_GB:en
-ENV LC_ALL en_GB.UTF-8
-
 #
 # Server directories layout
 #
