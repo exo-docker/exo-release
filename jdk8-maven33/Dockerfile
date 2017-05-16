@@ -1,4 +1,4 @@
-FROM       exoplatform/ci:jdk8-maven32
+FROM       exoplatform/ci:jdk8-maven33
 MAINTAINER eXo Platform <docker@exoplatform.com>
 
 ###
