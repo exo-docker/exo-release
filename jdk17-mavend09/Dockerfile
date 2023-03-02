@@ -1,4 +1,4 @@
-FROM       exoplatform/ci:jdk17-maven35
+FROM       exoplatform/ci:jdk17-mavend09
 MAINTAINER eXo Platform <docker@exoplatform.com>
 
 ###
@@ -68,7 +68,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib
    && chmod 755 ${TOOLS_DIR}/json
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.4.33
+ENV EXOR_VERSION 1.4.34
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
