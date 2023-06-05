@@ -56,10 +56,8 @@ RUN mkdir -p ${CONFIG_DIR} \
 RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash \
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
-## TODO Replace by jq
-ENV JSON_VERSION 9.0.3
-# Install json tools
-RUN apt-get update && apt-get install -y sudo nodejs-legacy && apt-get clean
+ENV JQ_VERSION 1.6
+RUN apt-get update && apt-get install -y sudo expect moreutils && apt-get clean
 
 # Specific for GateIn, install Tomcat and Jboss dependencies
 RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache-tomcat-7.0.16.tar.gz | tar xzf - -C /usr/share \
@@ -75,11 +73,11 @@ RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
-RUN curl -fsSL https://raw.githubusercontent.com/trentm/json/${JSON_VERSION}/lib/json.js -o ${TOOLS_DIR}/json \
-   && chmod 755 ${TOOLS_DIR}/json
+RUN curl -fsSL https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
+   && chmod 755 ${TOOLS_DIR}/jq
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.4.40
+ENV EXOR_VERSION 1.4.42
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
        && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
