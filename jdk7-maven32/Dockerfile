@@ -72,7 +72,7 @@ RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 ENV MAVEN_OPTS=${MAVEN_OPTS}" -Dservers.dir=${LOCAL_DEPENDENCIES_DIR}"
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.4.40
+ENV EXOR_VERSION 1.4.42
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
