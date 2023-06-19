@@ -1,4 +1,4 @@
-FROM       exoplatform/ci:jdk11-maven32
+FROM       exoplatform/ci:jdk17-maven39-alpine
 MAINTAINER eXo Platform <docker@exoplatform.com>
 
 ###
@@ -57,7 +57,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
 ENV JQ_VERSION 1.6
-RUN apt-get update && apt-get install -y sudo expect moreutils && apt-get clean
+RUN apk add --no-cache moreutils openssl
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
