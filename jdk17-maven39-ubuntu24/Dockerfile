@@ -1,4 +1,4 @@
-FROM       exoplatform/ci:jdk11-maven36
+FROM       exoplatform/ci:jdk17-maven39-ubuntu24
 MAINTAINER eXo Platform <docker@exoplatform.com>
 
 ###
