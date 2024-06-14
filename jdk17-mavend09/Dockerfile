@@ -67,7 +67,7 @@ RUN curl -fsSL https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}
    && chmod 755 ${TOOLS_DIR}/jq
 
 # Install eXo Release Manager
-ENV EXOR_VERSION 1.4.58
+ENV EXOR_VERSION 1.4.59
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
