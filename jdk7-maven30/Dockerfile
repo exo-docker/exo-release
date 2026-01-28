@@ -56,7 +56,7 @@ RUN mkdir -p ${CONFIG_DIR} \
 RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash \
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
-ENV JQ_VERSION=1.7.1
+ENV JQ_VERSION=1.8.1
 RUN apt-get update && apt-get install -y sudo expect moreutils && apt-get clean
 
 # Specific for GateIn, install Tomcat and Jboss dependencies
@@ -73,11 +73,11 @@ RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
-RUN curl -fsSL https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
+RUN curl -fsSL https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
    && chmod 755 ${TOOLS_DIR}/jq
 
 # Install eXo Release Manager
-ENV EXOR_VERSION=1.4.62
+ENV EXOR_VERSION=1.4.65
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
        && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
