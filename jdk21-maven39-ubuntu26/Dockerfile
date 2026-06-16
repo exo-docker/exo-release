@@ -1,4 +1,4 @@
-FROM       exoplatform/ci:jdk11-maven33
+FROM       exoplatform/ci:jdk21-maven39-ubuntu26
 LABEL maintainer="eXo Platform <docker@exoplatform.com>"
 
 ###

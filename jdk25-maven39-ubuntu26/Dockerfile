@@ -1,5 +1,5 @@
-FROM       exoplatform/ci:jdk11-maven33
-LABEL maintainer="eXo Platform <docker@exoplatform.com>"
+FROM       exoplatform/ci:jdk25-maven39-ubuntu26
+LABEL MAINTAINER="eXo Platform <docker@exoplatform.com>"
 
 ###
 # Environment variables needed for eXoR
