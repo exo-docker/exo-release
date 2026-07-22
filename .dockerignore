@@ -1,0 +1,7 @@
+# Ignore everything except Dockerfiles and build context
+.git
+.gitignore
+build.sh
+*.md
+LICENSE
+.DS_Store
