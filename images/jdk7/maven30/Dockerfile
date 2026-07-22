@@ -1,5 +1,7 @@
 FROM       exoplatform/ci:jdk7-maven30
 LABEL maintainer="eXo Platform <docker@exoplatform.com>"
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ###
 # Environment variables needed for eXoR
@@ -57,7 +59,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
 ENV JQ_VERSION=1.8.1
-RUN apt-get update && apt-get install -y sudo expect moreutils && apt-get clean
+RUN apt-get update && apt-get install -y --no-install-recommends sudo expect moreutils && rm -rf /var/lib/apt/lists/*
 
 # Specific for GateIn, install Tomcat and Jboss dependencies
 RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache-tomcat-7.0.16.tar.gz | tar xzf - -C /usr/share \
@@ -92,10 +94,10 @@ ARG ssh_passphrase=default
 ARG nexus_token=default
 ARG gpg_passphrase=default
 ARG jboss_password=default
-RUN echo "ssh_passphrase=`printf "%s" "$ssh_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-   && echo "nexus_token=`printf "%s" "$nexus_token" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-   && echo "gpg_passphrase=`printf "%s" "$gpg_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-   && echo "jboss_password=`printf "%s" "$jboss_password" | openssl enc -base64`" >> ${CREDENTIALS_FILE}
+RUN echo "ssh_passphrase=$(printf '%s' "$ssh_passphrase" | openssl enc -base64)" >> ${CREDENTIALS_FILE} \
+   && echo "nexus_token=$(printf '%s' "$nexus_token" | openssl enc -base64)" >> ${CREDENTIALS_FILE} \
+   && echo "gpg_passphrase=$(printf '%s' "$gpg_passphrase" | openssl enc -base64)" >> ${CREDENTIALS_FILE} \
+   && echo "jboss_password=$(printf '%s' "$jboss_password" | openssl enc -base64)" >> ${CREDENTIALS_FILE}
 
 ENTRYPOINT ["/opt/exo-release/scripts/setup-env.sh"]
 CMD ["help"]

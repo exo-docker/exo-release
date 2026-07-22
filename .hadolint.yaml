@@ -1,0 +1,4 @@
+ignored:
+  - DL3008  # pin apt-get versions: CI images use latest tool versions
+  - DL3018  # pin apk versions: CI images use latest tool versions
+  - DL3059  # multiple consecutive RUN: intentional layer separation
