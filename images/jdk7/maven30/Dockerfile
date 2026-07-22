@@ -86,7 +86,7 @@ RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/
    && chmod 755 ${TOOLS_DIR}/yq
 
 # Install eXo Release Manager
-ENV EXOR_VERSION=1.4.66
+ENV EXOR_VERSION=2.0.0
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
        && cp -R ${EXO_CI_TMP_DIR}/conf/* ${CONFIG_DIR} \

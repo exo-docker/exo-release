@@ -79,7 +79,7 @@ RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/
 ENV MAVEN_OPTS=${MAVEN_OPTS}" -Dservers.dir=${LOCAL_DEPENDENCIES_DIR}"
 
 # Install eXo Release Manager
-ENV EXOR_VERSION=1.4.66
+ENV EXOR_VERSION=2.0.0
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
         | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
         && cp -R ${EXO_CI_TMP_DIR}/conf/* ${CONFIG_DIR} \
