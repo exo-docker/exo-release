@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ###
 ENV EXOR_HOME=/opt/exo-release
 # The Release Workspace (Volume)
-ENV WORKSPACE_DIR=${EXOR_HOME}/workspace/
+ENV WORKSPACE_DIR=${EXOR_HOME}/workspace
 
 ###
 # All paths to store data in the WORKSPACE_DIR
