@@ -16,6 +16,7 @@ err()  { printf "${RED}[FAIL]${RESET} %s\n" "$*" >&2; }
 
 build_image() {
     local jdk=$1 maven=$2
+    shift 2
     local dockerfile="images/${jdk}/${maven}/Dockerfile"
     local tag="${IMAGE_BASE}:${jdk}-${maven}"
 
