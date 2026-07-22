@@ -25,7 +25,7 @@ build_image() {
     fi
 
     log "Building ${tag} ..."
-    if docker build -f "${dockerfile}" -t "${tag}" "${BUILD_CONTEXT}" "$@"; then
+    if docker build "$@" -f "${dockerfile}" -t "${tag}" "${BUILD_CONTEXT}"; then
         ok "Built ${tag}"
     else
         err "Failed to build ${tag}"
@@ -64,6 +64,7 @@ usage() {
 main() {
     local push=false
     local docker_args=()
+    local pos_args=()
 
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -76,13 +77,12 @@ main() {
                 exit 0
                 ;;
             --help|-h) usage ;;
-            jdk*|25) shift; break ;;
-            *) shift ;;
+            *) pos_args+=("$1"); shift ;;
         esac
     done
 
-    local jdk=${1:-}
-    local maven=${2:-}
+    local jdk=${pos_args[0]:-}
+    local maven=${pos_args[1]:-}
 
     if [ -n "$jdk" ] && [ -n "$maven" ]; then
         build_image "${jdk}" "${maven}" "${docker_args[@]}"
