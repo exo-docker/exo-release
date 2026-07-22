@@ -65,9 +65,13 @@ RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
 
-RUN curl -fsSL https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
+RUN curl -fsSL https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o /tmp/jq \
+   && echo "b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f  /tmp/jq" | sha256sum -c - \
+   && mv /tmp/jq ${TOOLS_DIR}/jq \
    && chmod 755 ${TOOLS_DIR}/jq
-RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o ${TOOLS_DIR}/yq \
+RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /tmp/yq \
+   && echo "fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4  /tmp/yq" | sha256sum -c - \
+   && mv /tmp/yq ${TOOLS_DIR}/yq \
    && chmod 755 ${TOOLS_DIR}/yq
 
 # Install eXo Release Manager
