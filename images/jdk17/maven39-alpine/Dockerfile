@@ -58,7 +58,8 @@ RUN mkdir -p ${CONFIG_DIR} \
 RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash \
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
-ENV JQ_VERSION=1.8.1
+ENV JQ_VERSION=1.8.2
+ENV YQ_VERSION=4.53.3
 RUN apk add --no-cache moreutils openssl
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
@@ -67,6 +68,8 @@ USER ${EXO_CI_USER}
 
 RUN curl -fsSL https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
    && chmod 755 ${TOOLS_DIR}/jq
+RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o ${TOOLS_DIR}/yq \
+   && chmod 755 ${TOOLS_DIR}/yq
 
 # Install eXo Release Manager
 ENV EXOR_VERSION=1.4.66
