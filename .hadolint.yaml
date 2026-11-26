@@ -1,0 +1,8 @@
+failure-threshold: warning
+ignored:
+  - DL3008 # apt packages are not version-pinned: the base images track the distribution
+  - DL3015 # keep the recommended packages the images have always had
+  - DL3018 # idem for Alpine
+  - DL3064 # the credentials ARGs are part of the Jenkins build contract (see README)
+  - DL4006 # the Alpine image has no bash: pipefail is not available in its /bin/sh
+  - SC3037 # echo -n in the credentials step, same reason

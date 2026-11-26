@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      images:
+        description: "Image tags to build (space separated), 'smoke' or 'all'"
+        default: smoke
+      exor_ref:
+        description: "swf-release-manager tag or branch to install (default: the Dockerfile's)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
+        with:
+          dockerfile: Dockerfile
+      - name: Lint legacy Dockerfiles and scripts
+        run: |
+          shellcheck build.sh
+          jq -e 'map(.tag) | length == (unique | length)' images.json
+          for f in legacy/*/Dockerfile; do
+            docker run --rm -i hadolint/hadolint:v2.12.0 hadolint --no-fail - < "$f"
+          done
+
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.m.outputs.images }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: m
+        env:
+          SELECTION: ${{ inputs.images || 'smoke' }}
+        run: |
+          case "$SELECTION" in
+            all) filter='[.[].tag]' ;;
+            smoke) filter='[.[] | select(.smoke) | .tag]' ;;
+            *) filter='$ARGS.positional' ;;
+          esac
+          if [ "$SELECTION" = all ] || [ "$SELECTION" = smoke ]; then
+            echo "images=$(jq -c "$filter" images.json)" >> "$GITHUB_OUTPUT"
+          else
+            # shellcheck disable=SC2086
+            echo "images=$(jq -nc '$ARGS.positional' --args $SELECTION)" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: [lint, matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJSON(needs.matrix.outputs.images) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build
+        env:
+          EXOR_REF: ${{ inputs.exor_ref }}
+        run: |
+          args=()
+          [ -n "$EXOR_REF" ] && args+=(-r "$EXOR_REF")
+          ./build.sh "${args[@]}" "${{ matrix.tag }}"
+      - name: Smoke test
+        run: |
+          image="exoplatform/release:${{ matrix.tag }}"
+          # `help` needs the Jenkins environment, so check the image content instead
+          docker run --rm --entrypoint sh "$image" -c '
+            set -e
+            for c in git mvn openssl; do command -v "$c" >/dev/null || { echo "missing: $c"; exit 1; }; done
+            tools=/opt/exo-release/tools
+            if [ -x "$tools/jq" ]; then "$tools/jq" --version && "$tools/yq" --version; else test -x "$tools/json"; fi
+            test -x /opt/exo-release/scripts/setup-env.sh
+            test -x /opt/exo-release/scripts/eXoR.sh
+          '

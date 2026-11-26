@@ -1,5 +1,5 @@
-FROM       exoplatform/ci:jdk25-maven39-ubuntu24
-LABEL MAINTAINER="eXo Platform <docker@exoplatform.com>"
+FROM       exoplatform/ci:jdk7-maven30
+LABEL maintainer="eXo Platform <docker@exoplatform.com>"
 
 ###
 # Environment variables needed for eXoR
@@ -29,7 +29,7 @@ ENV PRJ_DIR=${WORKSPACE_DIR}/projects
 ENV SCRIPTS_DIR=${EXOR_HOME}/scripts
 # Config for Maven, SSH, GIT
 ENV CONFIG_DIR=${EXOR_HOME}/config
-ENV CREDENTIALS_FILE=${HOME}/.exo_cred
+ENV CREDENTIALS_FILE=${HOME}/.swf_cred
 # Tools required (Maven, Git...)
 ENV TOOLS_DIR=${EXOR_HOME}/tools
 # Dependencies (Tomcat, JBoss) needed for some projects
@@ -57,25 +57,42 @@ RUN curl -fsSL https://raw.githubusercontent.com/git/git/master/contrib/completi
     && chown -R ${EXO_CI_USER}:${EXO_GROUP} ~/.git-completion.bash
 
 ENV JQ_VERSION=1.8.1
+# YAML catalogs of swf-release-manager (converted to JSON with yq)
+ENV YQ_VERSION=4.54.3
 RUN apt-get update && apt-get install -y sudo expect moreutils && apt-get clean
+
+# Specific for GateIn, install Tomcat and Jboss dependencies
+RUN curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.16/bin/apache-tomcat-7.0.16.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-tomcat-7.0.16 /apache-tomcat-7.0.16 \
+  && curl -fsSL http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.37/bin/apache-tomcat-7.0.37.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-tomcat-7.0.37 /apache-tomcat-7.0.37 \
+  && curl -fsSL http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/jboss-as-7.1.1.Final /jboss-as-7.1.1.Final \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /jboss-as-7.1.1.Final \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /apache-tomcat-7.0.37 \
+  && chown -R ${EXO_CI_USER}:${EXO_GROUP} /apache-tomcat-7.0.16
 
 RUN chown -R ${EXO_CI_USER}:${EXO_GROUP} ${EXOR_HOME}
 
 USER ${EXO_CI_USER}
-
 RUN curl -fsSL https://github.com/jqlang/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -o ${TOOLS_DIR}/jq \
    && chmod 755 ${TOOLS_DIR}/jq
 
+RUN curl -fsSL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o ${TOOLS_DIR}/yq \
+   && chmod 755 ${TOOLS_DIR}/yq
+
 # Install eXo Release Manager
-ENV EXOR_VERSION=1.4.75
+# Tag or branch of swf-release-manager (override: --build-arg EXOR_VERSION=<branch>)
+ARG EXOR_VERSION=1.4.75
+ENV EXOR_VERSION=${EXOR_VERSION}
 RUN curl -fsSL https://github.com/exoplatform/swf-release-manager/archive/${EXOR_VERSION}.tar.gz \
-        | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
-        && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
-        && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
-        && cp -R ${EXO_CI_TMP_DIR}/app/datas/* ${DATAS_DIR} \
-        && rm -rf ${EXO_CI_TMP_DIR}/app \
-        && chmod u+x ${SCRIPTS_DIR}/*.sh \
-        && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
+       | tar xzf - -C ${EXO_CI_TMP_DIR} --strip-components=1 \
+       && cp -R ${EXO_CI_TMP_DIR}/app/conf/* ${CONFIG_DIR} \
+       && cp -R ${EXO_CI_TMP_DIR}/app/scripts/* ${SCRIPTS_DIR} \
+       && cp -R ${EXO_CI_TMP_DIR}/app/datas/* ${DATAS_DIR} \
+       && rm -rf ${EXO_CI_TMP_DIR}/app \
+       && chmod u+x ${SCRIPTS_DIR}/*.sh \
+       && chmod u+x ${SCRIPTS_DIR}/utils/*.sh
 
 # Secure credentials
 ARG ssh_passphrase=default
@@ -84,10 +101,10 @@ ARG gpg_passphrase=default
 ARG jira_auth_header=default
 ARG jboss_password=default
 RUN echo "ssh_passphrase=`echo -n "$ssh_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-    && echo "nexus_token=`echo -n "$nexus_token" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-    && echo "gpg_passphrase=`echo -n "$gpg_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-    && echo "jira_auth_header=`echo -n "$jira_auth_header" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
-    && echo "jboss_password=`echo -n "$jboss_password" | openssl enc -base64`" >> ${CREDENTIALS_FILE}
+   && echo "nexus_token=`echo -n "$nexus_token" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "gpg_passphrase=`echo -n "$gpg_passphrase" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "jira_auth_header=`echo -n "$jira_auth_header" | openssl enc -base64`" >> ${CREDENTIALS_FILE} \
+   && echo "jboss_password=`echo -n "$jboss_password" | openssl enc -base64`" >> ${CREDENTIALS_FILE}
 
 ENTRYPOINT ["/opt/exo-release/scripts/setup-env.sh"]
 CMD ["help"]
